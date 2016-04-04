@@ -1,0 +1,30 @@
+#!/bin/sh
+
+set -eu
+
+badges_dir="$badges_dir"
+log="$log"
+percent_green="${percent_green:-80}"
+percent_yellow="${percent_yellow:-50}"
+badge_name="${badge_name:-coverage}"
+badge_subject="${badge_subject:-$badge_name}"
+
+statements=$(( $( xmllint --xpath '//metrics/@statements' "$log" | tr -d 'staemn="' | tr ' ' '+' | cut -c2- ) ))
+coveredstatements=$(( $( xmllint --xpath '//metrics/@coveredstatements' "$log" | tr -d 'covredstamn="' | tr ' ' '+' | cut -c2- ) ))
+percent=$(( (( $coveredstatements * 100 )) / $statements ))
+
+cd "$badges_dir"
+
+mkdir -p "$badge_name"
+cd "$badge_name"
+
+echo -n "$badge_subject" > subject
+echo -n "$percent%" > status
+
+if [ "$percent" -ge "$percent_green" ] ; then
+  echo -n green > color
+elif [ "$percent" -ge "$percent_yellow" ] ; then
+  echo -n yellow > color
+else
+  echo -n red > color
+fi

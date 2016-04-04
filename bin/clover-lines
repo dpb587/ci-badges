@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -eu
+
+badges_dir="$badges_dir"
+log="$log"
+badge_name="${badge_name:-loc}"
+badge_subject="${badge_subject:-$badge_name}"
+badge_color="${badge_color:-yellowgreen}"
+
+loc=$(( $( xmllint --xpath '//metrics/@loc' "$log" | tr -d 'loc="' | tr ' ' '+' | cut -c2- ) ))
+
+cd "$badges_dir"
+
+mkdir -p "$badge_name"
+cd "$badge_name"
+
+echo -n "$badge_subject" > subject
+echo -n "$loc" > status
+echo -n "$badge_color" > color

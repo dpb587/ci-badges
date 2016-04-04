@@ -1,0 +1,43 @@
+#!/bin/sh
+
+set -eu
+
+badges_dir="$badges_dir"
+publish_region="${publish_region:-us-east-1}"
+publish_bucket="$publish_bucket"
+publish_prefix="${publish_prefix:-}"
+publish_access_key="${publish_access_key:-}"
+publish_secret_key="${publish_secret_key:-}"
+
+export AWS_DEFAULT_REGION="$publish_region"
+export AWS_ACCESS_KEY_ID="$publish_access_key"
+export AWS_SECRET_ACCESS_KEY="$publish_secret_key"
+
+cd "$badges_dir"
+
+refs=""
+
+for ref in $( find .refs -type f ) ; do
+  ref=$( basename "$ref" )
+  refs="$refs $ref"
+done
+
+for badge in $( find . -type d ! -name '.*' ) ; do
+  badge=$( basename "$badge" )
+
+  cd $badge
+
+  badge_subject=$( cat subject )
+  badge_status=$( cat status )
+  badge_color=$( cat color )
+
+  echo "$badge ($badge_subject=$badge_status; $badge_color)"
+
+  curl -s "https://img.shields.io/badge/$badge_subject-$badge_status-$badge_color.svg" > /tmp/svg
+  
+  for ref in $refs ; do
+    aws s3api put-object --body /tmp/svg --content-type "image/svg+xml" --bucket "$publish_bucket" --key "${publish_prefix}$ref/$badge.svg" > /dev/null
+  done
+
+  cd ..
+done

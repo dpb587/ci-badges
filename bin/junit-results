@@ -1,0 +1,25 @@
+#!/bin/sh
+
+set -eu
+
+badges_dir="$badges_dir"
+log="$log"
+badge_name="${badge_name:-build}"
+badge_subject="${badge_subject:-$badge_name}"
+
+failures=$( xmllint --xpath 'string(//testsuites/testsuite/@failures) + string(//testsuites/testsuite/@errors)' "$log" )
+
+cd "$badges_dir"
+
+mkdir -p "$badge_name"
+cd "$badge_name"
+
+echo -n "$badge_subject" > subject
+
+if [ "$failures" -gt "0" ] ; then
+  echo -n failing > status
+  echo -n red > color
+else
+  echo -n passing > status
+  echo -n green > color
+fi

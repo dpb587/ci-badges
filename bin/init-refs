@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -eu
+
+pwd=$PWD
+badges_dir="$badges_dir"
+
+mkdir -p "$badges_dir"
+
+cd "$badges_dir"
+
+mkdir -p .refs
+
+cd .refs
+
+for ref in $@ ; do
+  if [[ "@" == $( echo "$ref" | cut -c1 ) ]] ; then
+    touch $( cd "$pwd" ; cat $( echo "$ref" | cut -c2- ) )
+  else
+    touch "$ref"
+  fi
+done

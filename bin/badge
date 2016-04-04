@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -eu
+
+badges_dir="$badges_dir"
+name="$name"
+subject="$subject"
+subject="$status"
+color="$color:-lightgrey}"
+
+cd "$badges_dir"
+
+mkdir -p "$name"
+cd "$name"
+
+echo -n "$subject" > subject
+echo -n "$status" > status
+echo -n "$color" > color

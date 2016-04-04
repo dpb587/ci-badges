@@ -1,0 +1,28 @@
+---
+jobs:
+  - name: "build-image"
+    serial: true
+    plan:
+      - get: "repo"
+        trigger: true
+      - put: "image"
+        params:
+          build: "repo"
+        get_params:
+          skip_download: true
+resources:
+  - name: "repo"
+    type: "git"
+    source:
+      uri: {{repo_uri}}
+      branch: {{repo_branch}}
+      private_key: {{repo_key}}
+  - name: "image"
+    type: "docker-image"
+    source:
+      repository: {{images_repo}}
+      tag: {{repo_branch}}
+      email: {{images_email}}
+      username: {{images_username}}
+      password: {{images_password}}
+      insecure_registries: [{{images_insecure_registries}}]
